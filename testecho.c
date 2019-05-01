@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 
    st = speex_echo_state_init(NN, TAIL);
    den = speex_preprocess_state_init(NN, sampleRate);
+   
    speex_echo_ctl(st, SPEEX_ECHO_SET_SAMPLING_RATE, &sampleRate);
    speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_ECHO_STATE, st);
 
@@ -41,9 +42,11 @@ int main(int argc, char **argv)
    {
       fread(ref_buf, sizeof(short), NN, ref_fd);
       fread(echo_buf, sizeof(short), NN, echo_fd);
+   
       speex_echo_cancellation(st, ref_buf, echo_buf, e_buf);
       speex_preprocess_run(den, e_buf);
       speex_echo_ctl(st, SPEEX_ECHO_GET_LAST_ECHO_FRAME, echo_frame);
+   
       fwrite(e_buf, sizeof(short), NN, e_fd);
       fwrite(echo_frame, sizeof(short), NN, echo_frame_fd);
    }
@@ -52,5 +55,6 @@ int main(int argc, char **argv)
    fclose(e_fd);
    fclose(echo_fd);
    fclose(ref_fd);
+   
    return 0;
 }
